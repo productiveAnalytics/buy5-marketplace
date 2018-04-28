@@ -12,7 +12,8 @@ import com.buy5.marketplace.model.Product;
 import com.buy5.marketplace.repository.ProductRepository;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static com.buy5.marketplace.model.Buy5Entity.OBJECT_MAPPER;
 
 @SpringBootApplication
 public class MarketplaceApplication {
@@ -29,13 +30,12 @@ public class MarketplaceApplication {
 							"{\"pid\": 3, \"name\": \"LevisJeans\", \"display_name\": \"Levi's Jeans\", \"price\": 33, \"inventory\": 35, \"cat_id\": 400}",
 							"{\"pid\": 4, \"name\": \"SurfacePro\", \"price\": 1500, \"display_name\": \"Microsoft Surface Pro\", \"inventory\": 0}"
 						 };
-		ObjectMapper mapper = new ObjectMapper();
 		
 		return args -> {
 			Arrays.asList(jsons).stream()
 								.forEach(jsonStr -> {
 											try {
-												Product p = mapper.readValue(jsonStr, Product.class);
+												Product p = OBJECT_MAPPER.readValue(jsonStr, Product.class);
 												prodRepo.create(p);
 											} catch (JsonParseException e) {
 												e.printStackTrace();

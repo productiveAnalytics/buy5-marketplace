@@ -1,11 +1,7 @@
 package com.buy5.marketplace.model;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @JsonPropertyOrder({"pid",
 					"name",
@@ -14,17 +10,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 					"inventory",
 					"cat_id"
 				   })
-public class Product implements Serializable {
+public final class Product extends Buy5Entity {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1728011471795833871L;
-	
-	// Primary Key
-	private Integer pid;
-	
-	private String name;
+	private static final long serialVersionUID = -1475617802178540346L;
+
 	private String description;
 	private int inventory;
 	private int price;
@@ -48,26 +37,18 @@ public class Product implements Serializable {
 				   int inventory,
 				   int price,
 				   Integer categoryId) {
-		this.pid = productId;
-		this.name = name;
+		super.setId(productId);
+		super.setName(name);
+		
 		this.description = displayName;
 		this.inventory = inventory;
 		this.price = price;
 		if (categoryId > 0) this.categoryId = categoryId;
 	}
 
-	public Integer getPid() {
-		return pid;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
+	@JsonProperty("pid")
+	public Integer getId() {
+		return super.getId();
 	}
 
 	@JsonProperty("display_name")
@@ -98,14 +79,5 @@ public class Product implements Serializable {
 	}
 	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
-	}
-	
-	@Override
-	public String toString() {
-		try {
-			return (new ObjectMapper()).writeValueAsString(this);
-		} catch (JsonProcessingException e) {
-			return super.toString();
-		}
 	}
 }

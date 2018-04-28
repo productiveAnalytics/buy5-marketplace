@@ -1,6 +1,6 @@
 package com.buy5.marketplace;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
