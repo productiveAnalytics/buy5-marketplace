@@ -21,7 +21,7 @@ public class ProductRepository {
 	// GET: /product/byId/{id}
 	public Optional<Product> findById(int pid) {
 		return elements.stream()
-					   .filter(p -> p.getPid() == pid)
+					   .filter(p -> p.getId() == pid)
 					   .findFirst();
 	}
 	
@@ -39,7 +39,7 @@ public class ProductRepository {
 
 	// PUT
 	public boolean update(Product prod) {
-		Optional<Product> existingProd = findById(prod.getPid());
+		Optional<Product> existingProd = findById(prod.getId());
 		existingProd.ifPresent(p -> updateDetails(p , prod));
 		return existingProd.isPresent();
 	}

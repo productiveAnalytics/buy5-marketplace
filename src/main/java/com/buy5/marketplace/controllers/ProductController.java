@@ -1,6 +1,5 @@
 package com.buy5.marketplace.controllers;
 
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,22 +8,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.buy5.marketplace.exceptions.ProductNotFoundException;
+import com.buy5.marketplace.exceptions.NotFoundException;
 import com.buy5.marketplace.model.Product;
 import com.buy5.marketplace.repository.ProductRepository;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @RestController
-public class ProductController {
+public class ProductController extends Buy5Controller {
 	@Autowired
 	private ProductRepository prodRepo;
 	
@@ -34,34 +29,35 @@ public class ProductController {
 		return this.prodRepo.findAll();
 	}
 	
+	/**
+	 * @see Buy5Controller#handleIllegalArgumentException(NotFoundException, javax.servlet.http.HttpServletResponse)
+	 */
 	@GetMapping(path="/product/id/{id}"
 			   ,produces=MediaType.APPLICATION_JSON_VALUE)
-	public Product getProductById(@PathVariable(name="id") Integer pid) throws ProductNotFoundException {
+	public Product getProductById(@PathVariable(name="id") Integer pid)
+					throws NotFoundException
+	{
 		Optional<Product> optionalRes = this.prodRepo.findById(pid);
 		 if (optionalRes.isPresent())
 			 return optionalRes.get();
 		 else
-			 throw new ProductNotFoundException("Product by Id "+pid+" not found."); 
+			 throw new NotFoundException(Product.class, "Product by Id "+pid+" not found."); 
 	}
 	
+	/**
+	 * @see Buy5Controller#handleIllegalArgumentException(NotFoundException, javax.servlet.http.HttpServletResponse)
+	 */
 	@GetMapping(path="/product/name/{name}"
 			   ,produces=MediaType.APPLICATION_JSON_VALUE)
-	public Product getProductById(@PathVariable(name="name") String prodName) throws ProductNotFoundException {
+	public Product getProductById(@PathVariable(name="name") String prodName)
+						throws NotFoundException
+	{
 		Optional<Product> optionalRes = this.prodRepo.findByName(prodName);
 		 if (optionalRes.isPresent())
 			 return optionalRes.get();
 		 else
-			 throw new ProductNotFoundException("Product by Name "+prodName+" not found."); 
+			 throw new NotFoundException(Product.class, "Product by Name "+prodName+" not found."); 
 	}
-	
-	@ExceptionHandler
-    void handleIllegalArgumentException(ProductNotFoundException prodNotFoundEx,
-                      					HttpServletResponse response) 
-                      							throws IOException
-	{
-		 // http code: 204
-         response.sendError(HttpStatus.NO_CONTENT.value());
-    }
 	
 	@PostMapping(path="/product"
 			    ,consumes=MediaType.APPLICATION_JSON_VALUE)
@@ -77,10 +73,10 @@ public class ProductController {
 	
 	private boolean createOrUpdateProduct(Product p) {
 		try {
-			getProductById(p.getPid());
+			getProductById(p.getId());
 			this.prodRepo.update(p);
 			return false;
-		} catch (ProductNotFoundException prodNotFoundEx) {
+		} catch (NotFoundException prodNotFoundEx) {
 			this.prodRepo.create(p);
 			return true;
 		}
