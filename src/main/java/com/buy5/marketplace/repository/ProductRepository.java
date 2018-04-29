@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.buy5.marketplace.exceptions.InvalidOperationException;
 import com.buy5.marketplace.model.Product;
 
+import static com.buy5.marketplace.Constants.*;
+
 @Repository
+@CrossOrigin(origins = CROSS_ORIGIN_URL)
 public class ProductRepository {
 	
 	List<Product> elements = new ArrayList<Product>();
@@ -54,8 +57,10 @@ public class ProductRepository {
 			// Don't let inventory fall below zero
 			if (newInventory < 0)
 				return false;
-			else 
+			else { 
 				prod.setInventory(newInventory);
+				return true;
+			}
 		}
 		
 		return false;

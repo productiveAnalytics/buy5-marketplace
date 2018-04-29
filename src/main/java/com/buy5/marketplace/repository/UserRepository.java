@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.buy5.marketplace.model.Person;
 
+import static com.buy5.marketplace.Constants.*;
+
 @Repository
+@CrossOrigin(origins = CROSS_ORIGIN_URL)
 public class UserRepository {
 	Person[] pers = {
 						new Person(0, "admin", "admin"),

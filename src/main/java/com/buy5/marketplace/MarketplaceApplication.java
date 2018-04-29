@@ -46,7 +46,7 @@ public class MarketplaceApplication {
 											}
 										 }
 										);
-			prodRepo.findAll().forEach(p -> System.out.println(p.getName()));
+			prodRepo.findAll().forEach(p -> System.out.println(p.getName() +"->"+ p.getInventory()));
 		};
 	}
 	

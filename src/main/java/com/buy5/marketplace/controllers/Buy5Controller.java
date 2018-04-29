@@ -5,10 +5,14 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.buy5.marketplace.exceptions.NotFoundException;
+import static com.buy5.marketplace.Constants.*;
 
+@CrossOrigin(origins = CROSS_ORIGIN_URL)
 public abstract class Buy5Controller {
 
 	/**
