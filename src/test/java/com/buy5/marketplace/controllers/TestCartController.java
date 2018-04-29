@@ -52,6 +52,40 @@ public class TestCartController {
 		
 		{
 			prodName = "galaxyNote9";
+			quantity = 3;
+			Order order = new Order(uname, prodName, quantity);
+							
+			params.put("userName", uname);
+			params.put("productName", prodName);
+			params.put("orderQuantity", quantity);
+		
+			restTmpltCart.put(BASE_URL + CART_ORDER_PUT_URI, order, params);
+		}
+	}
+	
+	@Test
+	@org.springframework.core.annotation.Order(value=2)
+	public void testFulfilOrderFailure() {
+		String uname = "larry";
+		String prodName;
+		int quantity = 0;
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		
+		{
+			prodName = "SurfacePro";
+			quantity = 15;
+			Order order = new Order(uname, prodName, quantity);
+							
+			params.put("userName", uname);
+			params.put("productName", prodName);
+			params.put("orderQuantity", quantity);
+		
+			restTmpltCart.put(BASE_URL + CART_ORDER_PUT_URI, order, params);
+		}
+		
+		{
+			prodName = "e-myth";
 			quantity = 5;
 			Order order = new Order(uname, prodName, quantity);
 							

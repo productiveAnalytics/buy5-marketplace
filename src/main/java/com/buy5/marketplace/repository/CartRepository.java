@@ -7,14 +7,19 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.buy5.marketplace.model.Order;
 import com.buy5.marketplace.model.Person;
 import com.buy5.marketplace.model.Product;
 
+import static com.buy5.marketplace.Constants.*;
+
 @Repository
+@CrossOrigin(origins = CROSS_ORIGIN_URL)
 public class CartRepository {
-	private static final String LOG_FORMAT = "{4,date} {4,time} User : {0} has bought {2,number} {1}(s) for Total Price: {3, number}";
+	private static final String LOG_FORMAT_SUCCESS = "{4,date} {4,time} User : {0} has bought {2,number} {1}(s) for Total Price: {3, number}";
+	private static final String LOG_FORMAT_FAILURE = "{4,date} {4,time} User : {0} could not buy {2,number} {1}(s)";
 	
 	@Autowired
 	private ProductRepository prodRepo;
@@ -45,24 +50,43 @@ public class CartRepository {
 			Optional<Product> optProd = prodRepo.findByName(productName);
 			if (optProd.isPresent()) {
 				Product prod = optProd.get();
-				prodRepo.adjustInvetory(prod.getId(), (-quantity));
 				
-				final int totalPrice = (quantity * prod.getPrice());
-				order.setTotalPrice(totalPrice);
-				
-				String logMsg = MessageFormat.format(LOG_FORMAT 
-													,userName	//0
-													,productName //1
-													,quantity //2
-													,totalPrice // 3
-													,order.getOrderDate() // 4
-													);
-				System.err.println(logMsg);
-				order.setSuccess(true);
-				
-				orders.add(order);
-				
-				successFlag = true;
+				// try to adjust inventory
+				if (prodRepo.adjustInvetory(prod.getId(), (-quantity)))
+				{
+					final int totalPrice = (quantity * prod.getPrice());
+					order.setTotalPrice(totalPrice);
+					
+					String logMsg = MessageFormat.format(LOG_FORMAT_SUCCESS 
+														,userName	//0
+														,productName //1
+														,quantity //2
+														,totalPrice // 3
+														,order.getOrderDate() // 4
+														);
+					System.out.println(logMsg);
+					order.setSuccess(true);
+					
+					orders.add(order);
+					
+					successFlag = true;
+				} 
+				else
+				{
+					String logMsg = MessageFormat.format(LOG_FORMAT_FAILURE 
+														,userName	//0
+														,productName //1
+														,quantity //2
+														,0 // 3
+														,order.getOrderDate() // 4
+														);
+					System.err.println(logMsg);
+					order.setSuccess(false);
+					
+					orders.add(order);
+					
+					successFlag = false;
+				}
 			}
 		}
 		
