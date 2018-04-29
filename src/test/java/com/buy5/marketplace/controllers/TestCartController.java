@@ -8,6 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -22,7 +23,7 @@ public class TestCartController {
 	private static final RestTemplate restTmpltCart = new RestTemplate();
 	private static final String BASE_URL = "http://localhost:8080";
 	
-	private static final String CART_ORDER_PUT_URI 		= "/order/{userName}/{productName}/{orderQuantity}";
+	private static final String CART_ORDER_POST_URI 	= "/order/{userName}/{productName}/{orderQuantity}";
 	private static final String CART_ORDER_GET_URI 		= "/order/{orderId}";
 	private static final String CART_ORDERS_GET_URI 	= "/orders";
 		
@@ -41,59 +42,84 @@ public class TestCartController {
 		{
 			prodName = "iPhoneX";
 			quantity = 5;
-			Order order = new Order(uname, prodName, quantity);
+//			Order order = new Order(uname, prodName, quantity);
 							
 			params.put("userName", uname);
 			params.put("productName", prodName);
 			params.put("orderQuantity", quantity);
 		
-			restTmpltCart.put(BASE_URL + CART_ORDER_PUT_URI, order, params);
+			Order o1 = restTmpltCart.postForObject((BASE_URL + CART_ORDER_POST_URI), null, Order.class, params);
+			assertNotNull("Order#1 created?", o1);
+			assertTrue("Order#1 successful?", o1.isSuccess());
 		}
 		
 		{
 			prodName = "galaxyNote9";
 			quantity = 3;
-			Order order = new Order(uname, prodName, quantity);
+//			Order order = new Order(uname, prodName, quantity);
 							
 			params.put("userName", uname);
 			params.put("productName", prodName);
 			params.put("orderQuantity", quantity);
 		
-			restTmpltCart.put(BASE_URL + CART_ORDER_PUT_URI, order, params);
+			Order o2 = restTmpltCart.postForObject((BASE_URL + CART_ORDER_POST_URI), null, Order.class, params);
+			assertNotNull("Order#2 created?", o2);
+			assertTrue("Order#2 successful?", o2.isSuccess());
 		}
 	}
 	
 	@Test
 	@org.springframework.core.annotation.Order(value=2)
 	public void testFulfilOrderFailure() {
-		String uname = "larry";
+		String uname;
 		String prodName;
 		int quantity = 0;
 		
 		Map<String, Object> params = new HashMap<String, Object>();
 		
 		{
+			uname = "larry";
 			prodName = "SurfacePro";
-			quantity = 15;
-			Order order = new Order(uname, prodName, quantity);
+			quantity = 15;			// asking for more than inventory
+//			Order order = new Order(uname, prodName, quantity);
 							
 			params.put("userName", uname);
 			params.put("productName", prodName);
 			params.put("orderQuantity", quantity);
 		
-			restTmpltCart.put(BASE_URL + CART_ORDER_PUT_URI, order, params);
+			Order o1 = restTmpltCart.postForObject((BASE_URL + CART_ORDER_POST_URI), null, Order.class, params);
+			assertNotNull("Order#1 created?", o1);
+			assertFalse("Order#1 not successful?", o1.isSuccess());
 		}
 		
 		{
-			prodName = "e-myth";
+			uname = "larry";
+			prodName = "e-myth";	// non-existent product
 			quantity = 5;
-			Order order = new Order(uname, prodName, quantity);
+//			Order order = new Order(uname, prodName, quantity);
 							
 			params.put("userName", uname);
 			params.put("productName", prodName);
 			params.put("orderQuantity", quantity);
 		
-			restTmpltCart.put(BASE_URL + CART_ORDER_PUT_URI, order, params);
+			Order o2 = restTmpltCart.postForObject((BASE_URL + CART_ORDER_POST_URI), null, Order.class, params);
+			assertNotNull("Order#2 created?", o2);
+			assertFalse("Order#2 not successful?", o2.isSuccess());
+		}
+		
+		{
+			uname = "hacker";		// invalid user
+			prodName = "LevisJeans";	
+			quantity = 10;
+//			Order order = new Order(uname, prodName, quantity);
+							
+			params.put("userName", uname);
+			params.put("productName", prodName);
+			params.put("orderQuantity", quantity);
+		
+			Order o3 = restTmpltCart.postForObject((BASE_URL + CART_ORDER_POST_URI), null, Order.class, params);
+			assertNotNull("Order#3 created?", o3);
+			assertFalse("Order#3 not successful?", o3.isSuccess());
 		}
 	}
 		

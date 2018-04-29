@@ -39,7 +39,7 @@ public class CartRepository {
 					 .findFirst();
 	}
 	
-	public synchronized boolean updateOrder(String userName, String productName, int quantity) {
+	public synchronized Order updateOrder(String userName, String productName, int quantity) {
 		final Order order = new Order(userName, productName, quantity);
 		
 		boolean successFlag = false;
@@ -87,10 +87,14 @@ public class CartRepository {
 					
 					successFlag = false;
 				}
+			} else {
+				System.err.println("ERROR: Invalid request for Product: "+ productName);
 			}
+		} else {
+			System.err.println("ERROR: Invalid access by username: "+ userName);
 		}
 		
 		order.setSuccess(successFlag);
-		return successFlag;
+		return order;
 	}
 }
