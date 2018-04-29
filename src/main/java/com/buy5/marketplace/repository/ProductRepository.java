@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.buy5.marketplace.exceptions.InvalidOperationException;
 import com.buy5.marketplace.model.Product;
 
 @Repository
@@ -44,7 +45,23 @@ public class ProductRepository {
 		return existingProd.isPresent();
 	}
 	
-	private void updateDetails(Product origProd, Product prod) {
+	public synchronized boolean adjustInvetory(Integer prodId, int adjustmentQuantity) {
+		Optional<Product> existingProd = findById(prodId);
+		if (existingProd.isPresent()) {
+			Product prod = existingProd.get();
+			final int newInventory = prod.getInventory() + adjustmentQuantity;
+			
+			// Don't let inventory fall below zero
+			if (newInventory < 0)
+				return false;
+			else 
+				prod.setInventory(newInventory);
+		}
+		
+		return false;
+	}
+			
+	private synchronized void updateDetails(Product origProd, Product prod) {
 		origProd.setName(prod.getName());
 		origProd.setDescription(prod.getDescription());
 		origProd.setInventory(prod.getInventory());
